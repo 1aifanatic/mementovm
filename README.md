@@ -36,6 +36,13 @@ The seeded **Contract Approval — Official Demo** walks through ten steps:
 
 The same normalized event contract drives both the simulator and production gateway.
 
+## Judge materials
+
+- Pitch deck: [PowerPoint](docs/pitch/Latch-MementoVM-Pitch-Deck.pptx) and [PDF](docs/pitch/Latch-MementoVM-Pitch-Deck.pdf).
+- Demo narration: [three-minute script](docs/demo/SCRIPT.md).
+- Demo capture plan: [shot list](docs/demo/SHOT_LIST.md).
+- Measured results: [evaluation report](docs/evaluation/REPORT.md).
+
 ## Architecture
 
 ```mermaid
