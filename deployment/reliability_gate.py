@@ -4,19 +4,46 @@ from __future__ import annotations
 
 import argparse
 import json
+import time
+import urllib.error
 import urllib.request
 
+REQUEST_INTERVAL_SECONDS = 0.55
 
-def request(base_url: str, path: str, *, method: str = "GET", body: dict | None = None) -> dict:
+
+def request(
+    base_url: str,
+    path: str,
+    *,
+    method: str = "GET",
+    body: dict | None = None,
+    rate_limit_retries: int = 2,
+) -> dict:
     data = json.dumps(body).encode() if body is not None else None
-    call = urllib.request.Request(
-        f"{base_url.rstrip('/')}{path}",
-        data=data,
-        method=method,
-        headers={"Content-Type": "application/json"},
-    )
-    with urllib.request.urlopen(call, timeout=30) as response:
-        return json.loads(response.read())
+    for attempt in range(rate_limit_retries + 1):
+        call = urllib.request.Request(
+            f"{base_url.rstrip('/')}{path}",
+            data=data,
+            method=method,
+            headers={"Content-Type": "application/json"},
+        )
+        try:
+            with urllib.request.urlopen(call, timeout=30) as response:
+                result = json.loads(response.read())
+                if REQUEST_INTERVAL_SECONDS > 0:
+                    time.sleep(REQUEST_INTERVAL_SECONDS)
+                return result
+        except urllib.error.HTTPError as error:
+            if error.code != 429 or attempt == rate_limit_retries:
+                raise
+            retry_after = max(1, int(error.headers.get("Retry-After", "60")))
+            print(
+                f"Rate limit reached; waiting {retry_after}s before retry "
+                f"{attempt + 1}/{rate_limit_retries}.",
+                flush=True,
+            )
+            time.sleep(retry_after)
+    raise RuntimeError("Unreachable rate-limit retry state")
 
 
 def run_once(base_url: str, run_number: int) -> dict:
@@ -78,11 +105,22 @@ def run_once(base_url: str, run_number: int) -> dict:
 
 
 def main() -> None:
+    global REQUEST_INTERVAL_SECONDS
     parser = argparse.ArgumentParser()
     parser.add_argument("--base-url", default="http://localhost:8000")
     parser.add_argument("--runs", type=int, default=10)
+    parser.add_argument(
+        "--request-interval-seconds",
+        type=float,
+        default=REQUEST_INTERVAL_SECONDS,
+        help="Pace requests so the production demo rate limit remains enabled.",
+    )
     args = parser.parse_args()
-    results = [run_once(args.base_url, run_number) for run_number in range(1, args.runs + 1)]
+    REQUEST_INTERVAL_SECONDS = max(0, args.request_interval_seconds)
+    results = []
+    for run_number in range(1, args.runs + 1):
+        results.append(run_once(args.base_url, run_number))
+        print(f"Completed reliability run {run_number}/{args.runs}.", flush=True)
     print(json.dumps({"passed": len(results), "failed": 0, "results": results}, indent=2))
 
 
