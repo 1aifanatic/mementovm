@@ -14,7 +14,7 @@
 **Expected winner announcement:** On or around August 17, 2026  
 **Product owner:** `<name>`  
 **Technical lead:** `<name>`  
-**Repository:** `https://github.com/<account>/mementovm`  
+**Repository:** `https://github.com/1aifanatic/mementovm`  
 **Production URL:** `https://<domain>`  
 **Devpost URL:** `<add after draft submission is created>`
 
@@ -2718,7 +2718,7 @@ Prefer an ECS instance RAM role when feasible so long-lived access keys are unne
 ### Step 4: Deploy
 
 ```text
-git clone https://github.com/<account>/mementovm.git
+git clone https://github.com/1aifanatic/mementovm.git
 cd mementovm
 cp .env.example .env
 # populate secrets securely
