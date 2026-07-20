@@ -21,6 +21,24 @@ fi
 cd "$APP_DIR"
 test -f .env || { echo "Missing $APP_DIR/.env" >&2; exit 1; }
 
+set -a
+# The operator-created file is the deployment's trusted secret source.
+# shellcheck disable=SC1091
+source .env
+set +a
+
+[[ "${APP_ENV:-}" == "production" ]] || {
+  echo "APP_ENV must be production for an ECS release." >&2
+  exit 1
+}
+for variable in POSTGRES_PASSWORD APP_SECRET_KEY EVENT_INGEST_API_KEY DASHSCOPE_API_KEY; do
+  value="${!variable:-}"
+  if [[ ${#value} -lt 16 || "$value" == change-* ]]; then
+    echo "$variable is missing or still uses a placeholder." >&2
+    exit 1
+  fi
+done
+
 git fetch --tags --prune
 if [[ -n "${DEPLOY_REF:-}" ]]; then
   git checkout --detach "$DEPLOY_REF"
@@ -35,4 +53,3 @@ PUBLIC_BASE_URL="${PUBLIC_BASE_URL:-http://localhost}"
 curl --fail --silent --show-error "$PUBLIC_BASE_URL/healthz"
 curl --fail --silent --show-error "$PUBLIC_BASE_URL/readyz"
 echo "Deployment verified at $PUBLIC_BASE_URL"
-

@@ -122,6 +122,11 @@ Copy `.env.example`; never commit `.env`. The release-critical values are:
 - `ALIBABA_CLOUD_OSS_REGION`, `ALIBABA_CLOUD_OSS_ENDPOINT`, and bucket credentials or an ECS RAM role.
 - `PUBLIC_DOMAIN` and `PUBLIC_BASE_URL` — TLS host and public URL.
 
+The ECS deploy script refuses to release unless `APP_ENV=production` and the
+database, application, event-ingestion, and Qwen secrets are non-placeholder
+values. In production, every event—including one labeled as simulator data—
+must present `X-Event-API-Key`; malformed deployments fail closed.
+
 The full catalog, with safe empty defaults, is in [`.env.example`](.env.example).
 
 ## API map

@@ -14,6 +14,9 @@ class Settings(BaseSettings):
     demo_user_id: str = "demo-user"
     database_url: str = "sqlite:///./memento.db"
     event_ingest_api_key: str = ""
+    event_payload_max_bytes: int = 65_536
+    public_rate_limit_per_minute: int = 120
+    approval_ttl_minutes: int = 30
 
     dashscope_api_key: str = ""
     qwen_base_url: str = "https://dashscope-intl.aliyuncs.com/compatible-mode/v1"
@@ -49,4 +52,3 @@ class Settings(BaseSettings):
 @lru_cache
 def get_settings() -> Settings:
     return Settings()
-

@@ -151,6 +151,7 @@ class Approval(Base):
     id: Mapped[str] = mapped_column(String(80), primary_key=True, default=uid)
     action_id: Mapped[str] = mapped_column(ForeignKey("actions.id"), index=True)
     requested_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now_utc)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     decision: Mapped[str | None] = mapped_column(String(30))
     decided_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     decided_by: Mapped[str | None] = mapped_column(String(120))
@@ -193,4 +194,3 @@ class EvaluationRun(Base):
     metrics: Mapped[dict] = mapped_column(JSON)
     started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=now_utc)
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-

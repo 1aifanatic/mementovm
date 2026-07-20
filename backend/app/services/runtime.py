@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Any
 
 from sqlalchemy import delete, func, select, update
@@ -664,7 +664,11 @@ class RuntimeService:
         if existing:
             return existing
         action.status = "AWAITING_APPROVAL"
-        approval = Approval(action_id=action.id, action_hash=digest(action.arguments))
+        approval = Approval(
+            action_id=action.id,
+            action_hash=digest(action.arguments),
+            expires_at=now_utc() + timedelta(minutes=self.settings.approval_ttl_minutes),
+        )
         self.db.add(approval)
         self._transition(
             version,
@@ -692,6 +696,15 @@ class RuntimeService:
             raise RuntimeError("Approval target is missing")
         if approval.decision:
             return self.serialize_action(action) | {"idempotent_replay": True}
+        expires_at = approval.expires_at
+        if expires_at.tzinfo is None:
+            expires_at = expires_at.replace(tzinfo=timezone.utc)
+        if expires_at <= now_utc():
+            approval.decision = "EXPIRED"
+            approval.decided_at = now_utc()
+            action.status = "AWAITING_APPROVAL"
+            self.db.commit()
+            raise ValueError("Approval expired; request a new approval before execution")
         if digest(action.arguments) != approval.action_hash:
             raise ValueError("Action changed after approval was requested")
         approval.decision = decision
@@ -702,7 +715,13 @@ class RuntimeService:
                 raise ValueError("Edited arguments are required")
             action.arguments = edited_arguments
             action.status = "AWAITING_APPROVAL"
-            self.db.add(Approval(action_id=action.id, action_hash=digest(action.arguments)))
+            self.db.add(
+                Approval(
+                    action_id=action.id,
+                    action_hash=digest(action.arguments),
+                    expires_at=now_utc() + timedelta(minutes=self.settings.approval_ttl_minutes),
+                )
+            )
             self.db.commit()
             return self.serialize_action(action)
         if decision == "REJECT":
@@ -950,6 +969,7 @@ class RuntimeService:
                     {
                         "approval_id": approval.id,
                         "requested_at": iso(approval.requested_at),
+                        "expires_at": iso(approval.expires_at),
                         "action_hash": approval.action_hash,
                         "action": self.serialize_action(action),
                         "supporting_cues": ["Legal approved contract-043 / v7", "Finance approved deal-043"],

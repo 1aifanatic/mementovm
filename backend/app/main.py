@@ -4,7 +4,8 @@ from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from typing import Annotated
 
-from fastapi import Depends, FastAPI, Header, HTTPException, Query
+from fastapi import Depends, FastAPI, Header, HTTPException, Query, Request
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import func, select, text
 from sqlalchemy.orm import Session
@@ -26,6 +27,7 @@ from .services.evaluation import EvaluationService, dataset
 from .services.compiler import CompilerService
 from .services.runtime import RuntimeService
 from .services.simulator import SimulatorService
+from .security import SlidingWindowRateLimiter, authorize_event_ingestion, validate_event_size
 
 
 @asynccontextmanager
@@ -52,6 +54,21 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+rate_limiter = SlidingWindowRateLimiter(get_settings().public_rate_limit_per_minute)
+
+
+@app.middleware("http")
+async def public_demo_rate_limit(request: Request, call_next):
+    settings = get_settings()
+    if settings.app_env == "production" and request.url.path not in {"/healthz", "/readyz"}:
+        client = request.client.host if request.client else "unknown"
+        if not rate_limiter.allow(client):
+            return JSONResponse(
+                status_code=429,
+                content={"detail": "Public demo rate limit exceeded"},
+                headers={"Retry-After": "60"},
+            )
+    return await call_next(request)
 
 DB = Annotated[Session, Depends(get_db)]
 
@@ -184,9 +201,8 @@ def receive_event(
     settings: Annotated[Settings, Depends(get_settings)],
     x_event_api_key: Annotated[str | None, Header()] = None,
 ) -> dict:
-    if request.source != "simulator" and settings.event_ingest_api_key:
-        if x_event_api_key != settings.event_ingest_api_key:
-            raise HTTPException(401, "Invalid event ingestion API key")
+    authorize_event_ingestion(settings, supplied_key=x_event_api_key, source=request.source)
+    validate_event_size(request.model_dump(mode="json"), settings.event_payload_max_bytes)
     return RuntimeService(db, settings).process_event(request)
 
 
