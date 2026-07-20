@@ -1,0 +1,21 @@
+id: contract-approval-official-demo
+name: Contract Approval - Official Demo
+seed: 42
+user_timezone: America/Chicago
+initial_message: >
+  When legal approves the new DPA, prepare the redline for Dana. Do not send
+  anything if the deal has already closed. If legal does not respond within
+  two days, ask Mark. Avoid nonurgent alerts during my 9-to-11 focus block.
+revision_message: Also wait for finance approval before preparing it.
+steps:
+  - lure_marketing_approval
+  - lure_old_rejection
+  - legal_approval_current
+  - unrelated_finance
+  - focus_block_start
+  - finance_approval_current
+  - focus_block_end
+  - approve_action
+  - duplicate_finance_event
+  - advance_absence_clock
+

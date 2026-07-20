@@ -1,0 +1,18 @@
+flowchart LR
+    U[User / Judge] --> FE[Next.js Memory Debugger]
+    FE --> API[FastAPI API]
+    API --> COMP[Qwen structured compiler]
+    COMP --> VAL[Schema + policy validator]
+    VAL --> DB[(PostgreSQL hot index + audit)]
+    SIM[Deterministic simulator] --> EVT[Event gateway]
+    EVT --> ROUTE[Exact cue router]
+    ROUTE --> DB
+    ROUTE --> EVAL[Validity + inhibitor evaluator]
+    EVAL --> QWEN[Qwen semantic adjudicator]
+    EVAL --> POLICY[Policy gate]
+    POLICY --> APPROVE[Human approval]
+    APPROVE --> EXEC[Idempotent executor]
+    EXEC --> DB
+    WORKER[Absence + time worker] --> DB
+    API --> OSS[Alibaba Cloud OSS]
+

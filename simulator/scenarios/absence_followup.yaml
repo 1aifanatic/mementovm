@@ -1,0 +1,13 @@
+id: absence-followup
+name: Missing legal response
+seed: 43
+expected_event:
+  channel: legal
+  event_type: legal.response_received
+  entity_constraints:
+    contract_id: contract-043
+window: PT48H
+on_absence:
+  tool_id: notification.create_internal_draft
+  recipient: Mark
+

@@ -1,0 +1,30 @@
+name: Deploy Alibaba ECS
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Commit SHA or release tag
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Deploy pinned ref over SSH
+        env:
+          ECS_HOST: ${{ secrets.ECS_HOST }}
+          ECS_USER: ${{ secrets.ECS_USER }}
+          ECS_SSH_KEY: ${{ secrets.ECS_SSH_KEY }}
+          DEPLOY_REF: ${{ inputs.ref }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s' "$ECS_SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H "$ECS_HOST" >> ~/.ssh/known_hosts
+          ssh "$ECS_USER@$ECS_HOST" "cd /opt/mementovm && DEPLOY_REF='$DEPLOY_REF' ./deployment/deploy_ecs.sh"
+

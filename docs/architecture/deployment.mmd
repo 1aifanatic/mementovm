@@ -1,0 +1,14 @@
+flowchart TB
+    Internet --> HTTPS[Caddy HTTPS]
+    subgraph AlibabaCloud[Alibaba Cloud]
+      subgraph ECS[Elastic Compute Service]
+        HTTPS --> FE[Next.js container]
+        HTTPS --> API[FastAPI container]
+        API --> WORKER[Worker container]
+        API --> DB[(PostgreSQL 16 + pgvector)]
+        WORKER --> DB
+      end
+      API --> OSS[Private OSS bucket]
+    end
+    API --> QWEN[Qwen Cloud API]
+
