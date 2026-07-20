@@ -39,6 +39,7 @@ The same normalized event contract drives both the simulator and production gate
 ## Judge materials
 
 - Pitch deck: [PowerPoint](docs/pitch/Latch-MementoVM-Pitch-Deck.pptx) and [PDF](docs/pitch/Latch-MementoVM-Pitch-Deck.pdf).
+- Demo video: [2:37 submission cut](docs/demo/Latch-MementoVM-Demo.mp4).
 - Demo narration: [three-minute script](docs/demo/SCRIPT.md).
 - Demo capture plan: [shot list](docs/demo/SHOT_LIST.md).
 - Measured results: [evaluation report](docs/evaluation/REPORT.md).
