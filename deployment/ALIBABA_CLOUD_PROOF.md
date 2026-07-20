@@ -2,6 +2,10 @@
 
 Status: **awaiting account credentials and first production deployment**
 
+Cost policy: **trial credits/free quotas only; zero out-of-pocket spend**. Follow
+[`TRIAL_CREDITS_RUNBOOK.md`](TRIAL_CREDITS_RUNBOOK.md) before any create or
+enable action and record only evidence from resources covered by an active trial.
+
 This document is intentionally not pre-filled with unverifiable claims. Replace
 each `PENDING` value during the deployment run and commit the redacted evidence.
 
@@ -50,4 +54,3 @@ bucket prefix, preferably through an ECS instance RAM role.
 
 Store screenshots under `deployment/proof/`. Do not include account IDs, private
 IPs, AccessKey IDs, security-group details, or secrets.
-

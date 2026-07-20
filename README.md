@@ -167,6 +167,12 @@ The automated suite covers schema validity, cross-session revision, lure rejecti
 
 The supported judging profile is a single Ubuntu ECS instance plus a private OSS bucket:
 
+This demo has a hard zero-out-of-pocket deployment policy. Provision only from
+an active free-tier offer, keep paid add-ons and auto-renewal disabled, and stop
+if the final confirmation does not show trial coverage and a USD 0 immediate
+charge. The exact approved configuration, quota checks, and teardown rules are
+in [`TRIAL_CREDITS_RUNBOOK.md`](deployment/TRIAL_CREDITS_RUNBOOK.md).
+
 1. Open ports 80/443 publicly and SSH only from the operator IP.
 2. Install Docker Engine and Compose v2 using [`install_docker_ecs.sh`](deployment/install_docker_ecs.sh).
 3. Clone the tagged repository to `/opt/mementovm` as the non-root `deploy` user.
