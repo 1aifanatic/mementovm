@@ -41,7 +41,8 @@ uploads replay/benchmark bundles to a private OSS bucket.
 to `ALIBABA_CLOUD_OSS_PREFIX/{run_id}.json`. The response records the bucket,
 region, object key, ETag, request ID, and timestamp without exposing credentials.
 Grant only `oss:PutObject`, `oss:GetObject`, and `oss:ListObjects` for the scoped
-bucket prefix, preferably through an ECS instance RAM role.
+bucket prefix through an ECS instance RAM role. The adapter uses temporary role
+credentials and OSS Signature V4; no long-lived Alibaba key is required on ECS.
 
 ## Evidence to capture
 

@@ -39,6 +39,29 @@ for variable in POSTGRES_PASSWORD APP_SECRET_KEY EVENT_INGEST_API_KEY DASHSCOPE_
   fi
 done
 
+for variable in ALIBABA_CLOUD_OSS_REGION ALIBABA_CLOUD_OSS_ENDPOINT ALIBABA_CLOUD_OSS_BUCKET; do
+  if [[ -z "${!variable:-}" ]]; then
+    echo "$variable is required for the production OSS proof." >&2
+    exit 1
+  fi
+done
+
+if [[ -z "${ALIBABA_CLOUD_ECS_RAM_ROLE:-}" ]]; then
+  if [[ -z "${ALIBABA_CLOUD_ACCESS_KEY_ID:-}" || -z "${ALIBABA_CLOUD_ACCESS_KEY_SECRET:-}" ]]; then
+    echo "Set ALIBABA_CLOUD_ECS_RAM_ROLE or a least-privilege OSS AccessKey pair." >&2
+    exit 1
+  fi
+fi
+
+[[ "${PUBLIC_BASE_URL:-}" == https://* ]] || {
+  echo "PUBLIC_BASE_URL must use HTTPS for the public release." >&2
+  exit 1
+}
+[[ -n "${PUBLIC_DOMAIN:-}" && "${PUBLIC_DOMAIN}" != "localhost" ]] || {
+  echo "PUBLIC_DOMAIN must be a public hostname for the production release." >&2
+  exit 1
+}
+
 git fetch --tags --prune
 if [[ -n "${DEPLOY_REF:-}" ]]; then
   git checkout --detach "$DEPLOY_REF"

@@ -28,6 +28,7 @@ class Settings(BaseSettings):
 
     alibaba_cloud_access_key_id: str = ""
     alibaba_cloud_access_key_secret: str = ""
+    alibaba_cloud_ecs_ram_role: str = ""
     alibaba_cloud_oss_region: str = ""
     alibaba_cloud_oss_endpoint: str = ""
     alibaba_cloud_oss_bucket: str = ""
@@ -39,10 +40,16 @@ class Settings(BaseSettings):
 
     @property
     def oss_configured(self) -> bool:
-        return all(
+        has_credentials = bool(
+            self.alibaba_cloud_ecs_ram_role
+            or (
+                self.alibaba_cloud_access_key_id
+                and self.alibaba_cloud_access_key_secret
+            )
+        )
+        return has_credentials and all(
             [
-                self.alibaba_cloud_access_key_id,
-                self.alibaba_cloud_access_key_secret,
+                self.alibaba_cloud_oss_region,
                 self.alibaba_cloud_oss_endpoint,
                 self.alibaba_cloud_oss_bucket,
             ]

@@ -128,7 +128,8 @@ Copy `.env.example`; never commit `.env`. The release-critical values are:
 - `DASHSCOPE_API_KEY` — Qwen Cloud API key.
 - `DATABASE_URL` and `POSTGRES_PASSWORD` — durable store.
 - `APP_SECRET_KEY` and `EVENT_INGEST_API_KEY` — application and event gateway secrets.
-- `ALIBABA_CLOUD_OSS_REGION`, `ALIBABA_CLOUD_OSS_ENDPOINT`, and bucket credentials or an ECS RAM role.
+- `ALIBABA_CLOUD_OSS_REGION`, `ALIBABA_CLOUD_OSS_ENDPOINT`, and the bucket name.
+- `ALIBABA_CLOUD_ECS_RAM_ROLE` (preferred) or a least-privilege OSS AccessKey pair.
 - `PUBLIC_DOMAIN` and `PUBLIC_BASE_URL` — TLS host and public URL.
 
 The ECS deploy script refuses to release unless `APP_ENV=production` and the
@@ -179,6 +180,11 @@ in [`TRIAL_CREDITS_RUNBOOK.md`](deployment/TRIAL_CREDITS_RUNBOOK.md).
 4. Create `.env` on the server and use an instance RAM role or least-privilege OSS credentials.
 5. Run [`deploy_ecs.sh`](deployment/deploy_ecs.sh).
 6. Execute the smoke test, export one replay to OSS, restart the containers, and confirm the intention survives.
+
+A purchased domain is not required for the demo. Set `PUBLIC_DOMAIN` to
+`latch.<public-ip-with-dashes>.sslip.io` and `PUBLIC_BASE_URL` to the matching
+`https://` URL. The free wildcard DNS resolves the embedded IP, and Caddy obtains
+an ordinary per-host certificate. Verify DNS resolution before deployment.
 
 Caddy terminates HTTPS automatically when `PUBLIC_DOMAIN` resolves to the ECS public IP. Full evidence and the post-deploy checklist live in [deployment/ALIBABA_CLOUD_PROOF.md](deployment/ALIBABA_CLOUD_PROOF.md).
 

@@ -32,10 +32,15 @@ the active trial and final zero-cost coverage must be visible in the console.
 - Quantity: one instance.
 - Networking: use the trial instance's included public connectivity; do not add a
   separately billed EIP, NAT gateway, load balancer, CDN, or paid bandwidth plan.
+- HTTPS: use `latch.<public-ip-with-dashes>.sslip.io` as the free DNS name and let
+  Caddy obtain a per-host certificate. Verify that the name resolves to the trial
+  instance before deploying; do not purchase a domain for the demo.
 - Storage: one private OSS bucket claimed through the 500 GB/one-month free-tier
   offer. Do not activate OSS from the pay-as-you-go activation screen.
 - Models: use an Alibaba Cloud Model Studio API key and its free token grant. Do
   not use the Qwen Cloud pay-as-you-go API-key flow.
+- Credentials: attach a least-privilege ECS RAM role for OSS and set
+  `ALIBABA_CLOUD_ECS_RAM_ROLE`; do not store Alibaba account-level AccessKeys.
 - Add-ons: no backup, snapshot plan, security add-on, support plan, subscription,
   auto-renewal, or marketplace image.
 
@@ -82,4 +87,3 @@ hackathon judging window ends, and in all cases before either trial expires.
 Stopping an instance is not sufficient if its disk or other retained resources
 can still accrue charges. After teardown, verify the billing console shows no
 running resources and USD 0 actual charges.
-
