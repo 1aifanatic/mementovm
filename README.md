@@ -149,6 +149,7 @@ make lint
 make test
 make build
 make smoke BASE_URL=http://localhost:8000
+make reliability BASE_URL=http://localhost:8000
 ```
 
 The automated suite covers schema validity, cross-session revision, lure rejection, compound cues, focus deferral, action-hash approval, duplicate events, duplicate approvals, exactly-once draft creation, absence detection, hot-index removal, prompt-injection containment, and all four evaluation modes.

@@ -1,4 +1,4 @@
-.PHONY: setup dev build lint test benchmark migrate smoke replay
+.PHONY: setup dev build lint test benchmark migrate smoke reliability replay
 
 setup:
 	python -m venv .venv
@@ -28,6 +28,8 @@ migrate:
 smoke:
 	.venv/bin/python deployment/smoke.py --base-url "$(BASE_URL)"
 
+reliability:
+	.venv/bin/python deployment/reliability_gate.py --base-url "$(BASE_URL)" --runs 10
+
 replay:
 	curl --fail -X POST "$(BASE_URL)/v1/replays/official-demo/export"
-
