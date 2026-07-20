@@ -43,6 +43,7 @@ The same normalized event contract drives both the simulator and production gate
 - Demo narration: [three-minute script](docs/demo/SCRIPT.md).
 - Demo capture plan: [shot list](docs/demo/SHOT_LIST.md).
 - Measured results: [evaluation report](docs/evaluation/REPORT.md).
+- Submission copy: [Devpost draft](docs/submission/DEVPOST_DRAFT.md).
 
 ## Architecture
 
